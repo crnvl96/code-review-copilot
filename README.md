@@ -4,8 +4,10 @@ Automated code review powered by Ollama and Golang
 
 ## Useful links
 
-You can check the project goals and the current state of each checkpoint by navigating through the following links.
+- Check the project goals and the current state of each task by accessing the [project's board view](https://github.com/orgs/omega-energia/projects/3/views/3).
+- Check Details about the next project checkpoins by acessing the [current milestone details](https://github.com/omega-energia/code-review-copilot/milestone/1)
 
-- [Table view](https://github.com/orgs/omega-energia/projects/3/views/1)
-- [Roadmap view](https://github.com/orgs/omega-energia/projects/3/views/2)
-- [Board view](https://github.com/orgs/omega-energia/projects/3/views/3)
+## Tools
+
+- The model we are currently using for test purposes is the [llama3.1-8b](https://ollama.com/library/llama3.1)
+- We are running the model in a container environment using [Docker](https://docs.docker.com/)
