@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  ollama-cpu:
+    image: ollama/ollama:latest
+    container_name: ollama-cpu
+    ports:
+      - "1111:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      restart_policy:
+        condition: always
+    tty: true
+    networks:
+      - ollama-docker
+
+  ollama-gpu:
+    image: ollama/ollama:latest
+    container_name: ollama-gpu
+    ports:
+      - "2222:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+      restart_policy:
+        condition: always
+    tty: true
+    networks:
+      - ollama-docker
+
+volumes:
+  ollama-data:
+    driver: local
+
+networks:
+  ollama-docker:
+    external: false
+
