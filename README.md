@@ -9,5 +9,5 @@ Automated code review powered by Ollama and Golang
 
 ## Tools
 
-- The model we are currently using for test purposes is the [llama3.1-8b](https://ollama.com/library/llama3.1)
+- The model we are currently using for test purposes is the [tinyllama-1.1b](https://ollama.com/library/tinyllama)
 - We are running the model in a container environment using [Docker](https://docs.docker.com/)
