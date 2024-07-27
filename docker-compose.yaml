@@ -2,10 +2,11 @@ version: '3.8'
 
 services:
   ollama-cpu:
+    env_file: .env
     image: ollama/ollama:latest
     container_name: ollama-cpu
     ports:
-      - "1111:11434"
+      - "${AI_CPU_PORT}:11434"
     volumes:
       - ollama-data:/root/.ollama
     deploy:
@@ -17,9 +18,10 @@ services:
 
   ollama-gpu:
     image: ollama/ollama:latest
+    env_file: .env
     container_name: ollama-gpu
     ports:
-      - "2222:11434"
+      - "${AI_GPU_PORT}:11434"
     volumes:
       - ollama-data:/root/.ollama
     deploy:
