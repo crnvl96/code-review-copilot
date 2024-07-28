@@ -4,55 +4,40 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
+	"github.com/omega-energia/code-review-copilot/pkg/env"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 )
 
-var (
-	AI_MODEL_NAME     = "AI_MODEL_NAME"
-	AI_PORT           = "AI_PORT"
-	AI_PROMPT         = "AI_PROMPT"
-	AI_TEMPERATURE    = "AI_TEMPERATURE"
-	AI_PRINT_BY_CHUNK = "AI_PRINT_BY_CHUNK"
-)
-
-func print() {
-	fmt.Print("test")
-}
-
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	e := env.Retrieve()
 
 	llm, err := ollama.New(
-		ollama.WithModel(os.Getenv(AI_MODEL_NAME)),
-		ollama.WithServerURL("http://localhost:"+os.Getenv(AI_PORT)),
+		ollama.WithModel(e.AiModelName),
+		ollama.WithServerURL(e.AiBaseUrl+e.AiPort),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	temp, err := strconv.ParseFloat(os.Getenv(AI_TEMPERATURE), 64)
+	temp, err := strconv.ParseFloat(e.AiTemperature, 64)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	shouldPrintByChunk, err := strconv.ParseBool(os.Getenv(AI_PRINT_BY_CHUNK))
+	shouldPrintByChunk, err := strconv.ParseBool(e.AiPrintByChunk)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	ctx := context.Background()
-	completion, err := llms.GenerateFromSinglePrompt(
+
+	_, err = llms.GenerateFromSinglePrompt(
 		ctx,
 		llm,
-		os.Getenv(AI_PROMPT)+"\n",
+		e.AiPrompt+"\n",
 		llms.WithTemperature(temp),
 		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
 			fmt.Print(string(chunk))
@@ -72,6 +57,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	_ = completion
 }
