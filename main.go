@@ -14,12 +14,10 @@ import (
 
 var (
 	AI_MODEL_NAME     = "AI_MODEL_NAME"
-	AI_CPU_PORT       = "AI_CPU_PORT"
-	AI_GPU_PORT       = "AI_GPU_PORT"
+	AI_PORT           = "AI_PORT"
 	AI_PROMPT         = "AI_PROMPT"
 	AI_TEMPERATURE    = "AI_TEMPERATURE"
 	AI_PRINT_BY_CHUNK = "AI_PRINT_BY_CHUNK"
-	AI_RUN_ON_GPU     = "AI_RUN_ON_GPU"
 )
 
 func print() {
@@ -32,29 +30,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	shouldRunOnGPU, err := strconv.ParseBool(os.Getenv(AI_RUN_ON_GPU))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	serverURL := func() ollama.Option {
-		baseURL := "http://localhost:"
-		var URL string
-
-		if shouldRunOnGPU {
-			URL = baseURL + os.Getenv(AI_GPU_PORT)
-
-			return ollama.WithServerURL(URL) // 34%/66% CPU/GPU based
-		}
-
-		URL = baseURL + os.Getenv(AI_CPU_PORT)
-
-		return ollama.WithServerURL(URL) // 100% CPU based
-	}
-
 	llm, err := ollama.New(
 		ollama.WithModel(os.Getenv(AI_MODEL_NAME)),
-		serverURL(),
+		ollama.WithServerURL("http://localhost:"+os.Getenv(AI_PORT)),
 	)
 	if err != nil {
 		log.Fatal(err)
