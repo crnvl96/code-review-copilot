@@ -38,7 +38,7 @@ func Temperature() float64 {
 	return temp
 }
 
-func SteamingFunc(ctx context.Context, chunk []byte) error {
+func StreamingFunc(ctx context.Context, chunk []byte) error {
 	fmt.Print(string(chunk))
 
 	return nil

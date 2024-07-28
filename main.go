@@ -9,11 +9,5 @@ import (
 func main() {
 	e := env.Retrieve()
 
-	ctx := contexts.ModelContext()
-	llm := model.Spec()
-	prompt := e.AiPrompt + "\n"
-	temp := model.Temperature()
-	str := model.SteamingFunc
-
-	model.Generate(ctx, llm, prompt, temp, str)
+	model.Generate(contexts.ModelContext(), model.Spec(), e.AiPrompt+"\n", model.Temperature(), model.StreamingFunc)
 }
