@@ -6,18 +6,38 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/omega-energia/code-review-copilot/pkg/env"
+	"github.com/omega-energia/code-review-copilot/pkg/spec"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 )
 
-func Spec() *ollama.LLM {
-	e := env.Retrieve()
-	serverURL := e.AiBaseUrl + e.AiPort
+type ModelInterface interface {
+	GenerateSpec() *ollama.LLM
+	GenerateTemperature() float64
+	StreamingFunc(ctx context.Context, chuk []byte) error
+	GetResponse(
+		ctx context.Context,
+		llm *ollama.LLM,
+		prompt string,
+		temp float64,
+		streamingFunc func(ctx context.Context, chunk []byte) error)
+}
+
+type Model struct {
+	spec spec.SpecInterface
+}
+
+func NewModel(spec spec.SpecInterface) *Model {
+	return &Model{spec: spec}
+}
+
+func (m *Model) GenerateSpec() *ollama.LLM {
+	e := m.spec.FromEnv()
+	URL := e.AiBaseUrl + e.AiPort
 
 	llm, err := ollama.New(
 		ollama.WithModel(e.AiModelName),
-		ollama.WithServerURL(serverURL),
+		ollama.WithServerURL(URL),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -26,11 +46,10 @@ func Spec() *ollama.LLM {
 	return llm
 }
 
-func Temperature() float64 {
+func (m *Model) GenerateTemperature() float64 {
 	bits := 64
-	e := env.Retrieve()
 
-	temp, err := strconv.ParseFloat(e.AiTemperature, bits)
+	temp, err := strconv.ParseFloat(m.spec.FromEnv().AiTemperature, bits)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,13 +57,13 @@ func Temperature() float64 {
 	return temp
 }
 
-func StreamingFunc(ctx context.Context, chunk []byte) error {
+func (m *Model) StreamingFunc(ctx context.Context, chunk []byte) error {
 	fmt.Print(string(chunk))
 
 	return nil
 }
 
-func Generate(
+func (m *Model) GetResponse(
 	ctx context.Context,
 	llm *ollama.LLM,
 	prompt string,

@@ -2,6 +2,16 @@ package contexts
 
 import "context"
 
-func ModelContext() context.Context {
+type ModelContextInterface interface {
+	Start() context.Context
+}
+
+type ModelContext struct{}
+
+func NewModelContext() *ModelContext {
+	return &ModelContext{}
+}
+
+func (m *ModelContext) Start() context.Context {
 	return context.Background()
 }
