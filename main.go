@@ -10,13 +10,13 @@ import (
 func main() {
 	validator := validation.NewValidator()
 	spec := spec.NewSpec(validator)
-	modelCtx := contexts.NewModelContext()
+	ctx := contexts.NewModelContext()
 	aiModel := model.NewModel(spec)
 
 	envVars := spec.FromEnv()
 
 	aiModel.GetResponse(
-		modelCtx.Start(),
+		ctx.Start(),
 		aiModel.GenerateSpec(),
 		envVars.AiPrompt+"\n",
 		aiModel.GenerateTemperature(),

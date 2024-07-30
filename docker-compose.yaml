@@ -12,6 +12,9 @@ services:
     deploy:
       restart_policy:
         condition: always
+      resources:
+          limits:
+            memory: 4G
     tty: true
     networks:
       - ollama-docker
