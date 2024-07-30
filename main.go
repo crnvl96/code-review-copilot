@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/omega-energia/code-review-copilot/internal/contexts"
+	"github.com/omega-energia/code-review-copilot/internal/env"
 	"github.com/omega-energia/code-review-copilot/internal/model"
 	"github.com/omega-energia/code-review-copilot/pkg/spec"
 	"github.com/omega-energia/code-review-copilot/pkg/validation"
@@ -9,7 +10,8 @@ import (
 
 func main() {
 	validator := validation.NewValidator()
-	spec := spec.NewSpec(validator)
+	envLoader := env.NewEnvLoader()
+	spec := spec.NewSpec(validator, envLoader)
 	ctx := contexts.NewModelContext()
 	aiModel := model.NewModel(spec)
 

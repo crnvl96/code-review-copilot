@@ -4,32 +4,34 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	"github.com/omega-energia/code-review-copilot/internal/env"
 	"github.com/omega-energia/code-review-copilot/pkg/validation"
 )
 
 type SpecInterface interface {
-	FromEnv() EnvConstants
+	FromEnv() SpecConstants
 }
 
 type Spec struct {
+	envLoader env.EnvLoaderInterface
 	validator validation.ValidatorInterface
 }
 
-func NewSpec(validator validation.ValidatorInterface) *Spec {
-	return &Spec{validator: validator}
+func NewSpec(validator validation.ValidatorInterface, envLoader env.EnvLoaderInterface) *Spec {
+	return &Spec{validator: validator, envLoader: envLoader}
 }
 
-type EnvConstants struct {
-	AiModelName    string
-	AiPort         string
-	AiPrompt       string
-	AiTemperature  string
-	AiPrintByChunk string
-	AiBaseUrl      string
+type SpecConstants struct {
+	AiModelName   string
+	AiPort        string
+	AiPrompt      string
+	AiTemperature string
+	AiBaseUrl     string
 }
 
-func (e *Spec) FromEnv() EnvConstants {
+func (e *Spec) FromEnv() SpecConstants {
+	e.envLoader.Load()
+
 	const (
 		aiModelName    = "AI_MODEL_NAME"
 		aiPort         = "AI_PORT"
@@ -38,11 +40,6 @@ func (e *Spec) FromEnv() EnvConstants {
 		aiPrintByChunk = "AI_PRINT_BY_CHUNK"
 		aiBaseURL      = "AI_BASE_URL"
 	)
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	modelName, err := e.validator.ModelName(os.Getenv(aiModelName))
 	if err != nil {
@@ -69,7 +66,7 @@ func (e *Spec) FromEnv() EnvConstants {
 		log.Fatal(err)
 	}
 
-	return EnvConstants{
+	return SpecConstants{
 		AiModelName:   modelName,
 		AiPort:        port,
 		AiPrompt:      prompt,
