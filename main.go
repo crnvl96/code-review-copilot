@@ -1,27 +1,38 @@
 package main
 
 import (
-	"github.com/omega-energia/code-review-copilot/internal/contexts"
-	"github.com/omega-energia/code-review-copilot/internal/env"
-	"github.com/omega-energia/code-review-copilot/internal/model"
-	"github.com/omega-energia/code-review-copilot/pkg/spec"
-	"github.com/omega-energia/code-review-copilot/pkg/validation"
+	"log"
+
+	"github.com/omega-energia/code-review-copilot/ollama/config"
+	"github.com/omega-energia/code-review-copilot/ollama/model"
 )
 
 func main() {
-	validator := validation.NewValidator()
-	envLoader := env.NewEnvLoader()
-	spec := spec.NewSpec(validator, envLoader)
-	ctx := contexts.NewModelContext()
-	aiModel := model.NewModel(spec)
-
-	envVars := spec.FromEnv()
-
-	aiModel.GetResponse(
-		ctx.Start(),
-		aiModel.GenerateSpec(),
-		envVars.AiPrompt+"\n",
-		aiModel.GenerateTemperature(),
-		aiModel.StreamingFunc,
+	var (
+		tinyLlamaLoader    = config.NewTinyLlamaLoader()
+		tinyLlamaValidator = config.NewTinyLlamaValidator()
+		tinyLlamaParser    = config.NewTinyLlamaParser()
 	)
+
+	args, err := tinyLlamaLoader.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	valid, err := tinyLlamaValidator.Validate(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config, err := tinyLlamaParser.Parse(valid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ollama := model.NewTinyLlama(config)
+
+	err = ollama.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
