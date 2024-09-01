@@ -1,4 +1,4 @@
-package constants
+package model
 
 const (
 	ModelBaseUrl          = "http://localhost:"

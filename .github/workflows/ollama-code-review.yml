@@ -2,20 +2,22 @@ name: Ollama code review
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
 
 jobs:
-  comment:
+  ollama_code_review:
     runs-on: ubuntu-latest
-
+    name: Ollama Code Review
     steps:
-    - name: Comment on the PR
-      uses: actions/github-script@v7
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.payload.pull_request.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: "hello world"
-          })
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Ollama Code Review
+        uses: ./github/actions/ollama-code-review
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_pr_id: ${{ github.event.pull_request.number }}
+
+# AI_MODEL_NAME="tinyllama"
+# AI_PORT="1111"
+# AI_PROMPT="Write a python function to count the quantity of rows in a CSV. Use the pandas library"
+# AI_TEMPERATURE="0.7"
