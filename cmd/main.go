@@ -1,21 +1,16 @@
 package main
 
-import "github.com/omega-energia/code-review-copilot/pkg/github"
+import (
+	"log"
+
+	"github.com/omega-energia/code-review-copilot/pkg/model/tinyllama"
+)
 
 func main() {
-	// tinyllama := tinyllama.NewTinyLlamaInstance()
-	//
-	// err := tinyllama.Run()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	//	loader := github.NewGithubSecretsLoader()
+	tinyllama := tinyllama.NewTinyLlamaInstance()
 
-	loader := github.NewGithubSecretsLoader()
-	validator := github.NewGithubSecretsValidator(loader)
-	parser := github.NewGithubSecretsParser(validator)
-	configurator := github.NewGithubSecretsConfigurator(parser)
-	starter := github.NewGithubClientStarter(configurator)
-
-	starter.Start()
+	err := tinyllama.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
