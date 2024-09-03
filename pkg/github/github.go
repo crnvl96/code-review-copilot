@@ -2,58 +2,78 @@ package github
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 
+	"github.com/crnvl96/code-review-copilot/pkg/tinyllama"
 	"github.com/google/go-github/v64/github"
 	"golang.org/x/oauth2"
 )
 
-func main() {
-	// Get the GITHUB_TOKEN from environment variables
-	token := os.Getenv("GITHUB_TOKEN")
+const (
+	AccessToken = "ACTION_ACCESS_TOKEN"
+	RepoOwner   = "REPOSITORY_OWNER"
+	RepoName    = "REPOSITORY_NAME"
+	PrNumber    = "PULL_REQUEST_NUMBER"
+)
+
+func Generate() error {
+	// This variable is retrieved from repository secrets, instead of a `.env` file
+	token := os.Getenv(AccessToken)
 	if token == "" {
-		log.Fatal("GITHUB_TOKEN environment variable not set")
+		err := fmt.Sprintf(
+			"%s environment variable must be set in repository settings",
+			AccessToken,
+		)
+		return errors.New(err)
 	}
 
-	// Get the repository and pull request information from environment variables
-	owner := os.Getenv("GITHUB_REPOSITORY_OWNER")
-	repo := os.Getenv("GITHUB_REPOSITORY_NAME")
-	prNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
+	owner := os.Getenv(RepoOwner)
+	repo := os.Getenv(RepoName)
 
-	// Convert prNumber to an integer
-	prNumberInt, err := strconv.Atoi(prNumber)
+	prNumberInt, err := strconv.Atoi(os.Getenv(PrNumber))
 	if err != nil {
-		log.Fatalf("Failed to convert PR number to int: %v", err)
+		return errors.New("Failed to convert PR number to int")
 	}
 
-	// Set up the GitHub client
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	// List files in the pull request
 	files, _, err := client.PullRequests.ListFiles(ctx, owner, repo, prNumberInt, nil)
 	if err != nil {
-		log.Fatalf("Failed to list files in the pull request: %v", err)
+		return errors.New("Failed to list files in the pull request")
 	}
 
-	// Iterate over the files and create a comment for each file
 	for _, file := range files {
-		comment := &github.IssueComment{
-			Body: github.String(fmt.Sprintf("File: %s", *file.Filename)),
-		}
-
-		_, _, err := client.Issues.CreateComment(ctx, owner, repo, prNumberInt, comment)
+		fileContent, err := os.ReadFile(*file.Filename)
 		if err != nil {
-			log.Fatalf("Failed to create comment for file %s: %v", *file.Filename, err)
+			log.Printf("Failed to read file %s: %v", *file.Filename, err)
+			continue
 		}
 
-		log.Printf("Comment created for file: %s", *file.Filename)
+		data := fmt.Sprintf("```typescript\n%s\n```", fileContent)
+
+		res, err := tinyllama.Run(data)
+		if err != nil {
+			return err
+		}
+
+		commentBody := fmt.Sprintf("Review for %s:\n%s", *file.Filename, res)
+
+		comment := &github.IssueComment{
+			Body: github.String(commentBody),
+		}
+
+		_, _, err = client.Issues.CreateComment(ctx, owner, repo, prNumberInt, comment)
+		if err != nil {
+			return errors.New("Failed to create comment")
+		}
 	}
+
+	return nil
 }
