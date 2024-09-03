@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 )
@@ -50,7 +49,7 @@ type modelArgs struct {
 
 func Run(data string) (string, error) {
 	params, err := generate()
-	url := baseUrl + port
+	url := baseUrl + params.port
 
 	ctx := context.Background()
 
@@ -98,10 +97,10 @@ func generate() (modelParams, error) {
 }
 
 func load() (modelArgs, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return modelArgs{}, err
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	return modelArgs{}, err
+	// }
 
 	return modelArgs{
 		name:   os.Getenv(name),
