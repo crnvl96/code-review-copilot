@@ -1,4 +1,4 @@
-module github.com/omega-energia/code-review-copilot
+module github.com/crnvl96/code-review-copilot
 
 go 1.22.0
 

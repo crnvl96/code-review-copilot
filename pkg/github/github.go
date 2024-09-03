@@ -8,13 +8,13 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/crnvl96/code-review-copilot/pkg/tinyllama"
 	"github.com/google/go-github/v64/github"
-	"github.com/omega-energia/code-review-copilot/pkg/tinyllama"
 	"golang.org/x/oauth2"
 )
 
 const (
-	AccessToken = "ACESS_TOKEN"
+	AccessToken = "ACTION_ACCESS_TOKEN"
 	RepoOwner   = "REPOSITORY_OWNER"
 	RepoName    = "REPOSITORY_NAME"
 	PrNumber    = "PULL_REQUEST_NUMBER"
@@ -25,7 +25,7 @@ func Generate() error {
 	token := os.Getenv(AccessToken)
 	if token == "" {
 		err := fmt.Sprintf(
-			"%s environment variable must be set in respository settings",
+			"%s environment variable must be set in repository settings",
 			AccessToken,
 		)
 		return errors.New(err)
@@ -57,8 +57,6 @@ func Generate() error {
 		}
 
 		data := fmt.Sprintf("```typescript\n%s\n```", fileContent)
-
-		fmt.Println("I got here!!!")
 
 		res, err := tinyllama.Run(data)
 		if err != nil {

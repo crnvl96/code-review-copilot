@@ -4,8 +4,8 @@ Automated code review powered by Ollama and Golang
 
 ## Useful links
 
-- Check the project goals and the current state of each task by accessing the [project's board view](https://github.com/orgs/omega-energia/projects/3/views/3).
-- Check Details about the next project checkpoins by acessing the [current milestone details](https://github.com/omega-energia/code-review-copilot/milestone/1)
+- Check the project goals and the current state of each task by accessing the [project's board view](https://github.com/orgs/crnvl96/projects/3/views/3).
+- Check Details about the next project checkpoins by acessing the [current milestone details](https://github.com/crnvl96/code-review-copilot/milestone/1)
 
 ## Tools
 

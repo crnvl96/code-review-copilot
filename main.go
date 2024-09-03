@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 
-	gh "github.com/omega-energia/code-review-copilot/pkg/github"
+	gh "github.com/crnvl96/code-review-copilot/pkg/github"
 )
 
 func main() {
-	fmt.Println("Starting job execution")
-	gh.Generate()
+	error := gh.Generate()
+	if error != nil {
+		fmt.Println(error)
+		log.Fatal(error)
+	}
 }

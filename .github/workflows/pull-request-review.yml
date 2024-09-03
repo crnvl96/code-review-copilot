@@ -20,7 +20,11 @@ jobs:
     - name: Run Go script
       run: go run .
       env:
-        ACESS_TOKEN: ${{ secrets.ACESS_TOKEN }}
+        ACTION_ACCESS_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
         REPOSITORY_OWNER: ${{ github.repository_owner }}
         REPOSITORY_NAME: ${{ github.event.pull_request.head.repo.name }}
         PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        AI_MODEL_NAME: "tinyllama"
+        AI_PORT: 1111
+        AI_PROMPT: "Write a short review for the code below:"
+        AI_TEMPERATURE: 0.7
