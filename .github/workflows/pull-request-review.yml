@@ -26,5 +26,5 @@ jobs:
         PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
         AI_MODEL_NAME: "tinyllama"
         AI_PORT: 1111
-        AI_PROMPT: "Write a short review for the code below:"
-        AI_TEMPERATURE: 0.7
+        AI_PROMPT: "Provide a short explanation about the code below:"
+        AI_TEMPERATURE: 0.3
