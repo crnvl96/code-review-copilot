@@ -55,7 +55,7 @@ func Generate() error {
 		return err
 	}
 
-	tinyLlama, err := tinyllama.GenerateModel(config)
+	llm, err := tinyllama.GenerateModel(config)
 	if err != nil {
 		return err
 	}
@@ -67,9 +67,7 @@ func Generate() error {
 			continue
 		}
 
-		data := fmt.Sprintf("```typescript\n%v\n```", fileContent)
-
-		res, err := tinyLlama(data)
+		res, err := llm(string(fileContent))
 		if err != nil {
 			return err
 		}

@@ -107,7 +107,7 @@ func validateName(i string) (string, error) {
 		return "", errors.New(constants.ErrEmptyLlmName)
 	}
 
-	if i != constants.LlmName {
+	if i != constants.LlmDefaultName {
 		return "", errors.New(constants.ErrInvalidLlmName)
 	}
 

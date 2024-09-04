@@ -30,7 +30,7 @@ func GenerateModel(
 		res, err := llms.GenerateFromSinglePrompt(
 			ctx,
 			llm,
-			fmt.Sprintf("%s\n\n%s", config.Prompt, modelPromptDetails),
+			fmt.Sprintf("%s\n%s", config.Prompt, modelPromptDetails),
 			llms.WithTemperature(config.Temp),
 			llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
 				fmt.Print(string(chunk))
