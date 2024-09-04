@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -60,6 +61,8 @@ func load() Args {
 }
 
 func validate(args Args) (Args, error) {
+	fmt.Println(args)
+
 	name, err := validateName(args.Name)
 	if err != nil {
 		return Args{}, err
