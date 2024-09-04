@@ -8,45 +8,56 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/crnvl96/code-review-copilot/pkg/config"
 	"github.com/crnvl96/code-review-copilot/pkg/tinyllama"
 	"github.com/google/go-github/v64/github"
 	"golang.org/x/oauth2"
 )
 
 const (
-	AccessToken = "ACTION_ACCESS_TOKEN"
-	RepoOwner   = "REPOSITORY_OWNER"
-	RepoName    = "REPOSITORY_NAME"
-	PrNumber    = "PULL_REQUEST_NUMBER"
+	accessToken = "ACTION_ACCESS_TOKEN"
+	repoOwner   = "REPOSITORY_OWNER"
+	repoName    = "REPOSITORY_NAME"
+	prNumber    = "PULL_REQUEST_NUMBER"
 )
 
 func Generate() error {
-	// This variable is retrieved from repository secrets, instead of a `.env` file
-	token := os.Getenv(AccessToken)
-	if token == "" {
+	tk := os.Getenv(accessToken)
+	if tk == "" {
 		err := fmt.Sprintf(
 			"%s environment variable must be set in repository settings",
-			AccessToken,
+			accessToken,
 		)
 		return errors.New(err)
 	}
 
-	owner := os.Getenv(RepoOwner)
-	repo := os.Getenv(RepoName)
+	owner := os.Getenv(repoOwner)
+	repo := os.Getenv(repoName)
 
-	prNumberInt, err := strconv.Atoi(os.Getenv(PrNumber))
+	prNumber := os.Getenv(prNumber)
+	prNumberInt, err := strconv.Atoi(prNumber)
 	if err != nil {
-		return errors.New("Failed to convert PR number to int")
+		return err
 	}
 
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: tk})
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
 	files, _, err := client.PullRequests.ListFiles(ctx, owner, repo, prNumberInt, nil)
 	if err != nil {
-		return errors.New("Failed to list files in the pull request")
+		return err
+	}
+
+	config, err := config.GenerateConfig()
+	if err != nil {
+		return err
+	}
+
+	tinyLlama, err := tinyllama.GenerateModel(config)
+	if err != nil {
+		return err
 	}
 
 	for _, file := range files {
@@ -56,14 +67,14 @@ func Generate() error {
 			continue
 		}
 
-		data := fmt.Sprintf("```typescript\n%s\n```", fileContent)
+		data := fmt.Sprintf("```typescript\n%v\n```", fileContent)
 
-		res, err := tinyllama.Run(data)
+		res, err := tinyLlama(data)
 		if err != nil {
 			return err
 		}
 
-		commentBody := fmt.Sprintf("Review for %s:\n%s", *file.Filename, res)
+		commentBody := fmt.Sprintf("Review for %s:\n\n%s", *file.Filename, res)
 
 		comment := &github.IssueComment{
 			Body: github.String(commentBody),
@@ -71,7 +82,7 @@ func Generate() error {
 
 		_, _, err = client.Issues.CreateComment(ctx, owner, repo, prNumberInt, comment)
 		if err != nil {
-			return errors.New("Failed to create comment")
+			return err
 		}
 	}
 
