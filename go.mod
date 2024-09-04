@@ -6,7 +6,6 @@ toolchain go1.22.4
 
 require (
 	github.com/google/go-github/v64 v64.0.0
-	github.com/joho/godotenv v1.5.1
 	github.com/tmc/langchaingo v0.1.12
 	golang.org/x/oauth2 v0.20.0
 )

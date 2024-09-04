@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	gh "github.com/crnvl96/code-review-copilot/pkg/github"
+	gh "github.com/crnvl96/code-review-copilot/pkg/pipeline/github"
 )
 
 func main() {
