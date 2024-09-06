@@ -10,9 +10,9 @@ import (
 	"github.com/tmc/langchaingo/llms/ollama"
 )
 
-func GenerateModel(
-	modelConfig config.ModelConfig,
-) (func(modelPromptDetails string) (string, error), error) {
+type runner func(modelPromptDetails string) (string, error)
+
+func GenerateModel(modelConfig config.ModelConfig) (runner, error) {
 	config := modelConfig.Config
 
 	url := constants.LlmContainerBaseUrl + config.Port

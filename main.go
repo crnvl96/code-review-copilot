@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	gh "github.com/crnvl96/code-review-copilot/pkg/pipeline/github"
+	"github.com/crnvl96/code-review-copilot/pkg/codereview"
 )
 
 func main() {
-	error := gh.Generate()
+	error := codereview.Generate()
 	if error != nil {
 		log.Fatal(error)
 	}
